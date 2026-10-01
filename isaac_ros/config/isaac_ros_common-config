@@ -1,0 +1,7 @@
+# Installed by scripts/sync_to_distro.sh as ${ISAAC_ROS_WS}/scripts/.isaac_ros_common-config,
+# which the Isaac ROS CLI reads instead of /etc/isaac-ros-cli/.isaac_ros_common-config.
+# Adds our Dockerfile directory to the image-layer search path (relative to that scripts/ dir).
+# Do NOT copy Dockerfiles into /etc/isaac-ros-cli/docker instead: the base layer bind-mounts
+# /etc/isaac-ros-cli as build context, so any new file there invalidates the build cache of
+# the base and RealSense layers (CUDA reinstall + librealsense recompile, ~40 min).
+CONFIG_DOCKER_SEARCH_DIRS=(/etc/isaac-ros-cli/docker ../src/rover_perception/isaac_ros/docker)
