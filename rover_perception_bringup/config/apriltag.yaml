@@ -1,0 +1,12 @@
+apriltag_node:
+  ros__parameters:
+    family: 36h11
+    # ASSUMPTION: printed tag edge length in metres (black square, not the white border).
+    # Replace with the measured size of the real tags before trusting the pose.
+    size: 0.162
+    max_hamming: 0
+    detector:
+      threads: 1
+      decimate: 2.0
+      blur: 0.0
+      refine: true

@@ -1,0 +1,15 @@
+# Get a model once (not committed, see models/.gitignore), e.g. with the ultralytics CLI:
+#   yolo export model=yolo11n.pt format=onnx imgsz=640
+# Any Ultralytics v8/v11 detect export works; the class names below assume COCO-80.
+detection_node:
+  ros__parameters:
+    model_path: ""            # absolute path to the .onnx file
+    use_gpu: false            # true = CUDAExecutionProvider when onnxruntime-gpu is installed
+    input_size: 640           # only used if the model has a dynamic input size
+    num_threads: 2            # CPU threads; keep low, the rest of the stack needs the cores
+    conf_threshold: 0.25      # decode threshold
+    iou_threshold: 0.45       # NMS
+    min_score: 0.4            # published threshold
+    allowed_labels: [""]      # e.g. ["person", "car"]; [""] = all classes
+    max_rate_hz: 10.0
+    autostart: true           # configure + activate on start (lifecycle otherwise)

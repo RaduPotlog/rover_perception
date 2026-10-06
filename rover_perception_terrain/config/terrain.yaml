@@ -1,0 +1,16 @@
+# Ground region is taken ahead of the rover in target_frame (z up). Lidar points are
+# transformed there with TF, so the lidar's own mounting tilt does not bias the slope.
+terrain_node:
+  ros__parameters:
+    target_frame: base_footprint
+    max_rate_hz: 5.0
+    roi:
+      min_x: 0.5
+      max_x: 4.0
+      max_abs_y: 1.5
+      max_abs_z: 0.6
+    ransac:
+      max_points: 2000
+      distance_threshold: 0.05
+      min_inlier_ratio: 0.3
+    smoothing: 0.5
