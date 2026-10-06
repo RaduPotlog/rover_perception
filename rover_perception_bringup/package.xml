@@ -7,8 +7,6 @@
   <maintainer email="potlogradu@gmail.com">radupotlog</maintainer>
   <license>Apache License 2.0</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
-
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>rclcpp_components</exec_depend>
