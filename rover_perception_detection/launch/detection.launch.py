@@ -26,6 +26,7 @@ def generate_launch_description():
         DeclareLaunchArgument('image_topic', default_value='camera/color/image_raw'),
         DeclareLaunchArgument('model_path', default_value=''),
         DeclareLaunchArgument('use_gpu', default_value='false'),
+        DeclareLaunchArgument('max_rate_hz', default_value='10.0'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         Node(
             package='rover_perception_detection',
@@ -36,6 +37,7 @@ def generate_launch_description():
                     [FindPackageShare('rover_perception_detection'), 'config', 'detection.yaml']),
                 {'model_path': LaunchConfiguration('model_path'),
                  'use_gpu': LaunchConfiguration('use_gpu'),
+                 'max_rate_hz': LaunchConfiguration('max_rate_hz'),
                  'use_sim_time': LaunchConfiguration('use_sim_time')},
             ],
             remappings=[('image_raw', LaunchConfiguration('image_topic'))],

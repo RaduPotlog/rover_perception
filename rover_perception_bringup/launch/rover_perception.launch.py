@@ -20,6 +20,12 @@ ROVER_CAMERA_FIDUCIALS       AprilTag detection on the colour stream (default fa
 ROVER_CAMERA_DETECTION       YOLO object detection on the colour stream (default false)
 ROVER_USE_TERRAIN            ground slope from the lidar cloud, no camera needed (default false)
 
+Cost knobs, for a loaded controller (all optional):
+ROVER_CAMERA_FPS                  colour and depth frame rate (default 15)
+ROVER_CAMERA_DEPTH_PROFILE        depth resolution WxH (default 424x240)
+ROVER_CAMERA_FIDUCIALS_DECIMATE   AprilTag decimation, higher = cheaper (default 2.0)
+ROVER_CAMERA_DETECTION_MAX_RATE   detections per second (default 10.0)
+
 The camera sub-switches only matter while ROVER_USE_CAMERA is true.
 """
 
@@ -57,6 +63,8 @@ def generate_launch_description():
     use_detection = LaunchConfiguration('use_detection')
     use_terrain = LaunchConfiguration('use_terrain')
     use_sim_time = LaunchConfiguration('use_sim_time')
+    camera_fps = LaunchConfiguration('camera_fps')
+    depth_profile = LaunchConfiguration('depth_profile')
 
     def camera_and(flag):
         return IfCondition(PythonExpression([env_flag(use_camera), ' and ', env_flag(flag)]))
@@ -70,8 +78,8 @@ def generate_launch_description():
         launch_arguments={
             'camera_name': 'camera',
             'camera_namespace': namespace,
-            'depth_module.depth_profile': '424x240x15',
-            'rgb_camera.color_profile': '640x480x15',
+            'depth_module.depth_profile': [depth_profile, 'x', camera_fps],
+            'rgb_camera.color_profile': ['640x480x', camera_fps],
             'enable_color': 'true',
             'enable_depth': 'true',
             'enable_infra1': 'false',
@@ -114,7 +122,8 @@ def generate_launch_description():
         parameters=[
             PathJoinSubstitution(
                 [FindPackageShare('rover_perception_bringup'), 'config', 'apriltag.yaml']),
-            {'use_sim_time': use_sim_time},
+            {'use_sim_time': use_sim_time,
+             'detector.decimate': LaunchConfiguration('fiducials_decimate')},
         ],
         remappings=[
             ('image_rect', 'camera/color/image_raw'),
@@ -135,6 +144,7 @@ def generate_launch_description():
             'image_topic': 'camera/color/image_raw',
             'model_path': LaunchConfiguration('detection_model'),
             'use_gpu': LaunchConfiguration('detection_use_gpu'),
+            'max_rate_hz': LaunchConfiguration('detection_max_rate'),
             'use_sim_time': use_sim_time,
         }.items(),
     )
@@ -160,6 +170,22 @@ def generate_launch_description():
             'detection_model',
             default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_MODEL', default_value=''),
             description='Path of the YOLO .onnx file.'),
+        DeclareLaunchArgument(
+            'camera_fps',
+            default_value=EnvironmentVariable('ROVER_CAMERA_FPS', default_value='15')),
+        DeclareLaunchArgument(
+            'depth_profile',
+            default_value=EnvironmentVariable(
+                'ROVER_CAMERA_DEPTH_PROFILE', default_value='424x240'),
+            description='Depth resolution WxH.'),
+        DeclareLaunchArgument(
+            'fiducials_decimate',
+            default_value=EnvironmentVariable(
+                'ROVER_CAMERA_FIDUCIALS_DECIMATE', default_value='2.0')),
+        DeclareLaunchArgument(
+            'detection_max_rate',
+            default_value=EnvironmentVariable(
+                'ROVER_CAMERA_DETECTION_MAX_RATE', default_value='10.0')),
         DeclareLaunchArgument(
             'detection_use_gpu',
             default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_GPU', default_value='false')),

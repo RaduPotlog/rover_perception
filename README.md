@@ -51,6 +51,17 @@ Detection model, once, not committed (`models/*.onnx` is git-ignored):
 yolo export model=yolo11n.pt format=onnx imgsz=640
 ```
 
+## Cost on your machine
+
+`rover_perception_bringup/scripts/benchmark.sh [seconds] [launch args]` launches the stack, then prints
+per-process CPU (percent of one core) and memory plus the real topic rates. Run the same command on the
+dev laptop and on the rover, ideally with the rest of the rover's stacks running.
+
+Dev laptop (i9-13900HX), camera + depth cloud + AprilTag + terrain, 15 fps: about 21 % of one core in
+total and 330 MB. With `camera_fps:=6 fiducials_decimate:=4.0`: 7 %. A Raspberry Pi 5 core is roughly
+3-4x slower (an estimate, not measured). Knobs: `ROVER_CAMERA_FPS` (6, 15 or 30), `ROVER_CAMERA_DEPTH_PROFILE`,
+`ROVER_CAMERA_FIDUCIALS_DECIMATE`, `ROVER_CAMERA_DETECTION_MAX_RATE`.
+
 ## Topics
 
 | Topic | Type | From |
