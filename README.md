@@ -2,7 +2,7 @@
 
 Lightweight, CPU-first perception for the rover. It replaces the earlier Isaac ROS
 FoundationStereo / FoundationPose kit (a ~50 GB Docker image, 5-8 GB of VRAM, 0.15-1.7 Hz,
-x86 only), which is kept for reference in [`isaac_ros_archive/`](isaac_ros_archive/).
+x86 only). That kit is gone from the tree; it stays in the git history (commit `facba89`).
 
 Everything runs natively in the normal colcon workspace: no Docker image of its own, no private
 zenoh router, no CUDA requirement.
@@ -41,8 +41,9 @@ colcon build --symlink-install --packages-up-to rover_perception_bringup
 ros2 launch rover_perception_bringup rover_perception.launch.py use_camera:=true use_terrain:=true
 ```
 
-A D435i inside WSL2 needs a usbipd attach first: `isaac_ros_archive/scripts/attach_camera.sh`
-still does it (it is independent of Isaac ROS).
+A D435i inside WSL2 needs a usbipd attach first: `rover_perception_bringup/scripts/attach_camera.sh`
+(`--once`, `--detach`). It then needs `sudo chmod a+rw /dev/video* && sudo chmod -R a+rw /dev/bus/usb`;
+both reset on every re-attach.
 
 Detection model, once, not committed (`models/*.onnx` is git-ignored):
 
