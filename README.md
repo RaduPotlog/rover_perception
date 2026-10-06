@@ -57,6 +57,7 @@ yolo export model=yolo11n.pt format=onnx imgsz=640
 | `camera/color/image_raw`, `camera/depth/image_rect_raw` | `sensor_msgs/Image` | realsense2_camera |
 | `camera/depth/points` | `sensor_msgs/PointCloud2` | depth_image_proc |
 | `detections` | `vision_msgs/Detection2DArray` | detection_node |
+| `tag_detections` | `apriltag_msgs/AprilTagDetectionArray` | apriltag_node |
 | `terrain/incline` | `geometry_msgs/Vector3Stamped`: x forward, y lateral, z total slope, degrees, positive = ground rising along +x / +y | terrain_node |
 | `terrain/ground_confidence` | `std_msgs/Float32` (inlier ratio) | terrain_node |
 | `tf` | AprilTag poses | apriltag_node |

@@ -93,6 +93,8 @@ def generate_launch_description():
             package='depth_image_proc',
             plugin='depth_image_proc::PointCloudXyzNode',
             name='depth_points',
+            # A composable node does not inherit its container's namespace.
+            namespace=namespace,
             remappings=[
                 ('image_rect', 'camera/depth/image_rect_raw'),
                 ('camera_info', 'camera/depth/camera_info'),
@@ -106,6 +108,7 @@ def generate_launch_description():
     apriltag = Node(
         package='apriltag_ros',
         executable='apriltag_node',
+        name='apriltag_node',  # must match the key in config/apriltag.yaml
         namespace=namespace,
         condition=camera_and(use_fiducials),
         parameters=[
@@ -116,6 +119,8 @@ def generate_launch_description():
         remappings=[
             ('image_rect', 'camera/color/image_raw'),
             ('camera_info', 'camera/color/camera_info'),
+            # `detections` is the YOLO node's vision_msgs topic; keep the tag array apart.
+            ('detections', 'tag_detections'),
         ],
         output='screen',
     )
