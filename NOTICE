@@ -1,0 +1,8 @@
+rover_perception
+Copyright 2026 Mechatronics Academy
+
+This product includes software derived from Intel's ADBSCAN follow-me component
+(open-edge-platform/edge-ai-suites, robotics-ai-suite/components/adbscan/Follow_me_RS_2D,
+files doDBSCAN.cpp, dbscan_adaptiveK.cpp, Util.cpp), Copyright (C) 2025 Intel Corporation,
+licensed under the Apache License, Version 2.0. The adaptive-parameter and clustering logic in
+rover_perception_fmoc/rover_perception_fmoc/domain/adbscan.py is a Python port of that code.

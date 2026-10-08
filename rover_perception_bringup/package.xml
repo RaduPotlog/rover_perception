@@ -3,18 +3,16 @@
 <package format="3">
   <name>rover_perception_bringup</name>
   <version>0.1.0</version>
-  <description>Launch and configuration for the lightweight perception stack: RealSense D435i, depth point cloud for Nav 2, AprilTag, object detection and terrain slope. Every part is switchable.</description>
+  <description>Launch and configuration for the lightweight perception stack: AprilTag, object detection, terrain slope and fmoc person tracking, on the sensor data rover_sensors publishes. Every part is switchable.</description>
   <maintainer email="potlogradu@gmail.com">radupotlog</maintainer>
   <license>Apache License 2.0</license>
 
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
-  <exec_depend>rclcpp_components</exec_depend>
-  <exec_depend>realsense2_camera</exec_depend>
-  <exec_depend>depth_image_proc</exec_depend>
   <exec_depend>apriltag_ros</exec_depend>
   <exec_depend>rover_perception_detection</exec_depend>
   <exec_depend>rover_perception_terrain</exec_depend>
+  <exec_depend>rover_perception_fmoc</exec_depend>
 
   <test_depend>python3-pytest</test_depend>
 

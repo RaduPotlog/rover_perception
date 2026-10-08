@@ -1,0 +1,52 @@
+# fmoc (follow-me on camera) person tracking. Frames come from fmoc.launch.py.
+#
+# Cost: the depth cloud is 424x240 at 15 Hz (rover_realsense). Strides of 5 keep about
+# 4k of its 100k points before the crop; max_points caps what reaches the clustering. On a Pi 5
+# lower process_rate or raise the strides if fmoc takes too much of a core.
+# "/**/": the node runs in the rover namespace, and a bare node name would not match it.
+/**/fmoc:
+  ros__parameters:
+    process_rate: 5.0
+    max_points: 2500
+    odom_timeout: 0.5          # s; older odom = motion unknown = no acquisition
+    tf_tolerance: 0.1          # s, newest odom transform accepted for a cloud stamped after it
+
+    filter:
+      row_stride: 5
+      col_stride: 5
+      min_x: 0.3               # m ahead of base_link
+      max_x: 5.0               # the rover lags behind a person who keeps walking
+      y_half_width: 2.0
+      z_min: 0.15              # m above base_link: drops the floor
+      z_max: 1.9
+
+    # Intel's RealSense ADBSCAN coefficients (adbscan_sub_RS.yaml); keep unless re-fitted.
+    adbscan:
+      base: 5.29545454
+      coeff_1: -0.164835164
+      coeff_2: -0.017982017
+      scale_factor: 0.9
+      # Not Intel's: a floor on eps (m, m per m of range) so a person alone in an open space
+      # stays a cluster at a few metres. Strides of 5 over 87 deg / 424 px space the points
+      # about 0.02 m per m; keep min_eps_per_m about twice that. Set both 0 for Intel's eps.
+      min_eps: 0.05
+      min_eps_per_m: 0.04
+
+    tracker:
+      # Stand here (base_link) with the rover stopped to be picked up.
+      acquire_x: 1.5
+      acquire_y: 0.0
+      acquire_radius: 0.6
+      min_width: 0.15
+      max_width: 1.0
+      min_height_span: 0.6
+      tracking_radius: 1.0     # Intel: 0.2 loses the person in turns
+      max_frames_blocked: 5
+      velocity_smoothing: 0.6
+      # Acquisition only with the rover standing still: odom twist below these (m/s, rad/s).
+      still_linear: 0.05
+      still_angular: 0.1
+      # Once lost: a person-sized cluster within reacquire_radius of the last sighting is them
+      # again, for reacquire_time s (rover moving or not).
+      reacquire_radius: 1.5
+      reacquire_time: 10.0

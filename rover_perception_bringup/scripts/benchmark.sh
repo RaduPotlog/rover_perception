@@ -2,13 +2,17 @@
 # Copyright 2026 Rover A1 contributors
 # Licensed under the Apache License, Version 2.0.
 #
-# What does the perception stack cost on THIS machine? Launches rover_perception_bringup, lets it
-# warm up, then reports per-process CPU (percent of ONE core, so 100 = a full core) and memory,
-# plus the real topic rates. Run the same command on the laptop and on the rover and compare.
+# What does the perception stack cost on THIS machine? Launches rover_perception_bringup (and,
+# with use_camera:=true, the RealSense driver from rover_sensors' rover_realsense), lets it warm
+# up, then reports per-process CPU (percent of ONE core, so 100 = a full core) and memory, plus
+# the real topic rates. Run the same command on the laptop and on the rover and compare.
 #
 #   benchmark.sh [seconds] [extra launch args...]
 #   benchmark.sh 60 use_camera:=true use_fiducials:=true use_terrain:=true
 #   benchmark.sh 60 use_camera:=true camera_fps:=10 depth_profile:=320x180
+#   benchmark.sh 60 use_camera:=true use_person_tracking:=true
+#
+# camera_fps, depth_profile and use_depth_cloud go to the driver, the rest to perception.
 #
 # Needs a sourced ROS 2 workspace and a running Zenoh router when rmw_zenoh_cpp is the RMW.
 # Run the rest of the rover's stacks at the same time to see the real contention; the CPU
@@ -20,18 +24,38 @@ shift || true
 ARGS=("$@")
 [[ ${#ARGS[@]} -eq 0 ]] && ARGS=(use_camera:=true)
 WARMUP=15
-PATTERNS=(realsense2_camera_node component_container apriltag_node terrain_node detection_node)
-TOPICS=(camera/color/image_raw camera/depth/image_rect_raw camera/depth/points)
+PATTERNS=(realsense2_camera_node component_container apriltag_node terrain_node detection_node
+          fmoc_node)
+TOPICS=(camera/color/image_raw camera/depth/image_rect_raw camera/depth/points tracked_person)
 NS="${ROVER_NAMESPACE:-}"
 TICKS="$(getconf CLK_TCK)"
 
+DRIVER_ARGS=()
+PERCEPTION_ARGS=()
+USE_CAMERA=false
+for a in "${ARGS[@]}"; do
+    case "$a" in
+        camera_fps:=* | depth_profile:=* | use_depth_cloud:=*) DRIVER_ARGS+=("$a") ;;
+        *) PERCEPTION_ARGS+=("$a") ;;
+    esac
+    [[ "${a,,}" =~ ^use_camera:=(true|1|yes|on)$ ]] && USE_CAMERA=true
+done
+
 LOG="$(mktemp -t rover_perception_bench.XXXXXX)"
-setsid ros2 launch rover_perception_bringup rover_perception.launch.py "${ARGS[@]}" > "$LOG" 2>&1 &
-LAUNCH_PID=$!
+LAUNCH_PIDS=()
+if [[ "$USE_CAMERA" == true ]]; then
+    setsid ros2 launch rover_realsense rover_realsense.launch.py "${DRIVER_ARGS[@]}" >> "$LOG" 2>&1 &
+    LAUNCH_PIDS+=($!)
+fi
+setsid ros2 launch rover_perception_bringup rover_perception.launch.py "${PERCEPTION_ARGS[@]}" \
+    >> "$LOG" 2>&1 &
+LAUNCH_PIDS+=($!)
 stop() {
-    kill -INT -- "-$LAUNCH_PID" 2> /dev/null || kill -INT "$LAUNCH_PID" 2> /dev/null || true
+    for pid in "${LAUNCH_PIDS[@]}"; do
+        kill -INT -- "-$pid" 2> /dev/null || kill -INT "$pid" 2> /dev/null || true
+    done
     sleep 3
-    kill -TERM -- "-$LAUNCH_PID" 2> /dev/null || true
+    for pid in "${LAUNCH_PIDS[@]}"; do kill -TERM -- "-$pid" 2> /dev/null || true; done
 }
 trap stop EXIT
 

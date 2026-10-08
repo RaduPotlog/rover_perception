@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rover_perception_fmoc</name>
+  <version>0.1.0</version>
+  <description>
+    fmoc (follow-me on camera) person tracking for Rover A1: Intel's ADBSCAN person clustering,
+    ported to Python, on the RealSense depth cloud, with a person tracker in the global frame.
+    Publishes the tracked person on tracked_person (rover_msgs/TrackedPerson); never drives.
+  </description>
+  <maintainer email="potlogradu@gmail.com">radupotlog</maintainer>
+  <license>Apache License 2.0</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rover_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>sensor_msgs_py</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>tf2_ros_py</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <!-- KD-tree for the clustering; without it a slower numpy fallback is used. -->
+  <exec_depend>python3-scipy</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -14,19 +14,23 @@
 
 """Lightweight perception: one switch per part, balenaCloud variables as defaults.
 
-ROVER_USE_CAMERA             RealSense D435i driver and everything fed by it (default false)
-ROVER_CAMERA_DEPTH_CLOUD     depth -> PointCloud2 for the Nav 2 costmaps (default true)
+The sensor drivers are not started here: rover_sensors does that (the RealSense in
+rover_realsense), and rover_sensors_bringup includes this file on top of them. In Gazebo the
+simulator publishes the same topics.
+
+ROVER_USE_CAMERA             camera-fed nodes below may run (default false)
 ROVER_CAMERA_FIDUCIALS       AprilTag detection on the colour stream (default false)
 ROVER_CAMERA_DETECTION       YOLO object detection on the colour stream (default false)
 ROVER_USE_TERRAIN            ground slope from the lidar cloud, no camera needed (default false)
+ROVER_START_FOLLOW_ME        fmoc person tracking on camera/depth/points -> tracked_person, for
+                             rover_orchestrator's follow-me (default false)
 
 Cost knobs, for a loaded controller (all optional):
-ROVER_CAMERA_FPS                  colour and depth frame rate (default 15)
-ROVER_CAMERA_DEPTH_PROFILE        depth resolution WxH (default 424x240)
 ROVER_CAMERA_FIDUCIALS_DECIMATE   AprilTag decimation, higher = cheaper (default 2.0)
 ROVER_CAMERA_DETECTION_MAX_RATE   detections per second (default 10.0)
 
-The camera sub-switches only matter while ROVER_USE_CAMERA is true.
+The camera sub-switches only matter while ROVER_USE_CAMERA is true. Person tracking is not tied
+to it: it only needs a depth cloud, which Gazebo provides without the RealSense driver.
 """
 
 from launch import LaunchDescription
@@ -39,8 +43,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
     PythonExpression,
 )
-from launch_ros.actions import ComposableNodeContainer, Node
-from launch_ros.descriptions import ComposableNode
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -58,60 +61,14 @@ def flag_arg(name, env, default):
 def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     use_camera = LaunchConfiguration('use_camera')
-    use_depth_cloud = LaunchConfiguration('use_depth_cloud')
     use_fiducials = LaunchConfiguration('use_fiducials')
     use_detection = LaunchConfiguration('use_detection')
     use_terrain = LaunchConfiguration('use_terrain')
+    use_person_tracking = LaunchConfiguration('use_person_tracking')
     use_sim_time = LaunchConfiguration('use_sim_time')
-    camera_fps = LaunchConfiguration('camera_fps')
-    depth_profile = LaunchConfiguration('depth_profile')
 
     def camera_and(flag):
         return IfCondition(PythonExpression([env_flag(use_camera), ' and ', env_flag(flag)]))
-
-    # Depth at 424x240 / 15 Hz is plenty for a 3 m costmap source and keeps USB and CPU load low.
-    realsense = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [FindPackageShare('realsense2_camera'), 'launch', 'rs_launch.py'])),
-        condition=IfCondition(env_flag(use_camera)),
-        launch_arguments={
-            'camera_name': 'camera',
-            'camera_namespace': namespace,
-            'depth_module.depth_profile': [depth_profile, 'x', camera_fps],
-            'rgb_camera.color_profile': ['640x480x', camera_fps],
-            'enable_color': 'true',
-            'enable_depth': 'true',
-            'enable_infra1': 'false',
-            'enable_infra2': 'false',
-            'enable_gyro': 'false',
-            'enable_accel': 'false',
-            'pointcloud.enable': 'false',  # depth_image_proc below does it, only when wanted
-            'align_depth.enable': 'false',
-        }.items(),
-    )
-
-    depth_cloud = ComposableNodeContainer(
-        name='depth_cloud_container',
-        namespace=namespace,
-        package='rclcpp_components',
-        executable='component_container',
-        condition=camera_and(use_depth_cloud),
-        composable_node_descriptions=[ComposableNode(
-            package='depth_image_proc',
-            plugin='depth_image_proc::PointCloudXyzNode',
-            name='depth_points',
-            # A composable node does not inherit its container's namespace.
-            namespace=namespace,
-            remappings=[
-                ('image_rect', 'camera/depth/image_rect_raw'),
-                ('camera_info', 'camera/depth/camera_info'),
-                ('points', 'camera/depth/points'),
-            ],
-            parameters=[{'use_sim_time': use_sim_time}],
-        )],
-        output='screen',
-    )
 
     apriltag = Node(
         package='apriltag_ros',
@@ -157,27 +114,27 @@ def generate_launch_description():
         launch_arguments={'namespace': namespace, 'use_sim_time': use_sim_time}.items(),
     )
 
+    person_tracking = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [FindPackageShare('rover_perception_fmoc'), 'launch', 'fmoc.launch.py'])),
+        condition=IfCondition(env_flag(use_person_tracking)),
+        launch_arguments={'namespace': namespace, 'use_sim_time': use_sim_time}.items(),
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'namespace', default_value=EnvironmentVariable('ROVER_NAMESPACE', default_value='')),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         flag_arg('use_camera', 'ROVER_USE_CAMERA', 'false'),
-        flag_arg('use_depth_cloud', 'ROVER_CAMERA_DEPTH_CLOUD', 'true'),
         flag_arg('use_fiducials', 'ROVER_CAMERA_FIDUCIALS', 'false'),
         flag_arg('use_detection', 'ROVER_CAMERA_DETECTION', 'false'),
         flag_arg('use_terrain', 'ROVER_USE_TERRAIN', 'false'),
+        flag_arg('use_person_tracking', 'ROVER_START_FOLLOW_ME', 'false'),
         DeclareLaunchArgument(
             'detection_model',
             default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_MODEL', default_value=''),
             description='Path of the YOLO .onnx file.'),
-        DeclareLaunchArgument(
-            'camera_fps',
-            default_value=EnvironmentVariable('ROVER_CAMERA_FPS', default_value='15')),
-        DeclareLaunchArgument(
-            'depth_profile',
-            default_value=EnvironmentVariable(
-                'ROVER_CAMERA_DEPTH_PROFILE', default_value='424x240'),
-            description='Depth resolution WxH.'),
         DeclareLaunchArgument(
             'fiducials_decimate',
             default_value=EnvironmentVariable(
@@ -189,9 +146,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'detection_use_gpu',
             default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_GPU', default_value='false')),
-        realsense,
-        depth_cloud,
         apriltag,
         detection,
         terrain,
+        person_tracking,
     ])
