@@ -14,7 +14,9 @@
     filter:
       row_stride: 5
       col_stride: 5
-      min_x: 0.3               # m ahead of base_link
+      # m ahead of base_link. The body reaches 0.413 m (rover_description), so anything closer
+      # is the rover itself: at 0.3 fmoc locked onto its own front and chased it (2026-10-10).
+      min_x: 0.5
       max_x: 5.0               # the rover lags behind a person who keeps walking
       y_half_width: 2.0
       z_min: 0.15              # m above base_link: drops the floor

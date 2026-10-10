@@ -32,7 +32,7 @@ class CloudFilterConfig:
     # every (row_stride * col_stride)-th point.
     row_stride: int = 4
     col_stride: int = 4
-    min_x: float = 0.3
+    min_x: float = 0.5
     max_x: float = 4.0
     y_half_width: float = 2.0
     # Height band above base_link's origin: drops the floor and anything over head height.

@@ -76,7 +76,7 @@ class FmocNode(Node):
         self.declare_parameter('tf_tolerance', 0.1)
         self.declare_parameter('filter.row_stride', 5)
         self.declare_parameter('filter.col_stride', 5)
-        self.declare_parameter('filter.min_x', 0.3)
+        self.declare_parameter('filter.min_x', 0.5)
         self.declare_parameter('filter.max_x', 5.0)
         self.declare_parameter('filter.y_half_width', 2.0)
         self.declare_parameter('filter.z_min', 0.15)
