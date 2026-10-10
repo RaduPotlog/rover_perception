@@ -27,7 +27,7 @@ ROVER_SYSTEM_FOLLOW_ME_ENABLE   fmoc person tracking on camera/depth/points -> t
 
 Cost knobs, for a loaded controller (all optional):
 ROVER_SENSORS_CAMERA_FIDUCIALS_DECIMATE  AprilTag decimation, higher = cheaper (default 2.0)
-ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE  detections per second (default 10.0)
+ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE  detections per second (default 3.0)
 
 The camera sub-switches only matter while ROVER_SYSTEM_USE_CAMERA is true. Person tracking is not
 tied to it: it only needs a depth cloud, which Gazebo provides without the RealSense driver.
@@ -144,7 +144,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'detection_max_rate',
             default_value=EnvironmentVariable(
-                'ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE', default_value='10.0')),
+                'ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE', default_value='3.0')),
         DeclareLaunchArgument(
             'detection_use_gpu',
             default_value=EnvironmentVariable(

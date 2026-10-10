@@ -40,7 +40,7 @@ class DetectionNode(Node):
         self.declare_parameter('iou_threshold', 0.45)
         self.declare_parameter('min_score', 0.4)
         self.declare_parameter('allowed_labels', [''])  # [''] = every class
-        self.declare_parameter('max_rate_hz', 10.0)
+        self.declare_parameter('max_rate_hz', 3.0)
         self.declare_parameter('autostart', True)
         self._bridge = CvBridge()
         self._use_case = None

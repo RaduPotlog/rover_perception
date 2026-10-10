@@ -11,5 +11,5 @@ detection_node:
     iou_threshold: 0.45       # NMS
     min_score: 0.4            # published threshold
     allowed_labels: [""]      # e.g. ["person", "car"]; [""] = all classes
-    max_rate_hz: 10.0
+    max_rate_hz: 3.0
     autostart: true           # configure + activate on start (lifecycle otherwise)
