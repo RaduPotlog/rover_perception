@@ -79,7 +79,7 @@ class FmocNode(Node):
         self.declare_parameter('filter.min_x', 0.5)
         self.declare_parameter('filter.max_x', 5.0)
         self.declare_parameter('filter.y_half_width', 2.0)
-        self.declare_parameter('filter.z_min', 0.15)
+        self.declare_parameter('filter.z_min', 0.30)
         self.declare_parameter('filter.z_max', 1.9)
         self.declare_parameter('adbscan.base', 5.29545454)
         self.declare_parameter('adbscan.coeff_1', -0.164835164)

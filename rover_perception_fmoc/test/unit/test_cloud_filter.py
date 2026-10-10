@@ -47,7 +47,8 @@ def test_optical_frame_is_rotated_into_the_base_frame():
     to_base = np.eye(4)
     to_base[:3, :3] = [[0, 0, 1], [-1, 0, 0], [0, -1, 0]]
     to_base[:3, 3] = [0.25, 0.0, 0.5]
-    cfg = CloudFilterConfig(row_stride=1, col_stride=1)
+    # z_min explicit: the rotation is under test, not the default crop.
+    cfg = CloudFilterConfig(row_stride=1, col_stride=1, z_min=0.15)
     # 2 m ahead, 0.5 m to the right, 0.3 m below the camera.
     out = filter_cloud(np.array([[0.5, 0.3, 2.0]]), to_base, cfg)
     np.testing.assert_allclose(out, [[2.25, -0.5, 0.2]])

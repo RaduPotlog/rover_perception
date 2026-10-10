@@ -36,7 +36,7 @@ class CloudFilterConfig:
     max_x: float = 4.0
     y_half_width: float = 2.0
     # Height band above base_link's origin: drops the floor and anything over head height.
-    z_min: float = 0.15
+    z_min: float = 0.30
     z_max: float = 1.9
 
     def __post_init__(self):

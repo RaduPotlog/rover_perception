@@ -19,7 +19,10 @@
       min_x: 0.5
       max_x: 5.0               # the rover lags behind a person who keeps walking
       y_half_width: 2.0
-      z_min: 0.15              # m above base_link: drops the floor
+      # m above base_link: drops the floor, and the flat part of the rover the camera looks over
+      # (points at 0.07-0.21 m out to 0.8 m ahead; read as a person at 0.64 m on 2026-10-10).
+      # A person's legs start ~0.33 m here, so tracking is unaffected.
+      z_min: 0.30
       z_max: 1.9
 
     # Intel's RealSense ADBSCAN coefficients (adbscan_sub_RS.yaml); keep unless re-fitted.
