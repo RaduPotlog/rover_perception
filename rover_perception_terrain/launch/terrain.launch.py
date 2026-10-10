@@ -23,7 +23,8 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     return LaunchDescription([
         DeclareLaunchArgument(
-            'namespace', default_value=EnvironmentVariable('ROVER_NAMESPACE', default_value='')),
+            'namespace',
+            default_value=EnvironmentVariable('ROVER_SYSTEM_NAMESPACE', default_value='')),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         Node(
             package='rover_perception_terrain',

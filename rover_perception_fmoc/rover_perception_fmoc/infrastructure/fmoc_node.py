@@ -217,7 +217,8 @@ class FmocNode(Node):
         if silent > 2.0:
             self.get_logger().warning(
                 f'No depth cloud on camera/depth/points for {silent:.0f} s '
-                '(ROVER_USE_CAMERA, ROVER_CAMERA_DEPTH_CLOUD)', throttle_duration_sec=30.0)
+                '(ROVER_SYSTEM_USE_CAMERA, ROVER_SENSORS_CAMERA_DEPTH_CLOUD)',
+                throttle_duration_sec=30.0)
 
     def _on_cloud(self, msg: PointCloud2):
         now = time.monotonic()

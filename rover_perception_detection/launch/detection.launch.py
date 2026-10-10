@@ -22,7 +22,8 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
-            'namespace', default_value=EnvironmentVariable('ROVER_NAMESPACE', default_value='')),
+            'namespace',
+            default_value=EnvironmentVariable('ROVER_SYSTEM_NAMESPACE', default_value='')),
         DeclareLaunchArgument('image_topic', default_value='camera/color/image_raw'),
         DeclareLaunchArgument('model_path', default_value=''),
         DeclareLaunchArgument('use_gpu', default_value='false'),

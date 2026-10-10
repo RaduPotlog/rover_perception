@@ -28,15 +28,15 @@ All are environment variables, so on the rover they are balenaCloud fleet or dev
 
 | Variable | Default | Effect |
 |----------|---------|--------|
-| `ROVER_USE_CAMERA` | `false` | the camera-fed nodes below may run (the driver itself is `rover_sensors`') |
-| `ROVER_CAMERA_FIDUCIALS` | `false` | AprilTag |
-| `ROVER_CAMERA_DETECTION` | `false` | object detection (needs `ROVER_CAMERA_DETECTION_MODEL`) |
-| `ROVER_USE_TERRAIN` | `false` | ground slope from the lidar |
-| `ROVER_START_FOLLOW_ME` | `false` | fmoc person tracking (`use_person_tracking`); the same variable starts follow-me in `rover-a1-orchestrator` |
+| `ROVER_SYSTEM_USE_CAMERA` | `false` | the camera-fed nodes below may run (the driver itself is `rover_sensors`') |
+| `ROVER_SENSORS_CAMERA_FIDUCIALS` | `false` | AprilTag |
+| `ROVER_SENSORS_CAMERA_DETECTION` | `false` | object detection (needs `ROVER_SENSORS_CAMERA_DETECTION_MODEL`) |
+| `ROVER_SENSORS_TERRAIN` | `false` | ground slope from the lidar |
+| `ROVER_SYSTEM_FOLLOW_ME_ENABLE` | `false` | fmoc person tracking (`use_person_tracking`); the same variable starts follow-me in `rover-a1-orchestrator` |
 
-Person tracking is not gated by `ROVER_USE_CAMERA`: it only needs `camera/depth/points`, which
-Gazebo publishes without the driver. Driver knobs (`ROVER_CAMERA_DEPTH_CLOUD`, `ROVER_CAMERA_FPS`,
-`ROVER_CAMERA_DEPTH_PROFILE`) are `rover_realsense` arguments now.
+Person tracking is not gated by `ROVER_SYSTEM_USE_CAMERA`: it only needs `camera/depth/points`, which
+Gazebo publishes without the driver. Driver knobs (`ROVER_SENSORS_CAMERA_DEPTH_CLOUD`, `ROVER_SENSORS_CAMERA_FPS`,
+`ROVER_SENSORS_CAMERA_DEPTH_PROFILE`) are `rover_realsense` arguments now.
 
 ## Run
 
@@ -72,8 +72,8 @@ dev laptop and on the rover, ideally with the rest of the rover's stacks running
 
 Dev laptop (i9-13900HX), camera + depth cloud + AprilTag + terrain, 15 fps: about 21 % of one core in
 total and 330 MB. With `camera_fps:=6 fiducials_decimate:=4.0`: 7 %. A Raspberry Pi 5 core is roughly
-3-4x slower (an estimate, not measured). Knobs: `ROVER_CAMERA_FPS` (6, 15 or 30), `ROVER_CAMERA_DEPTH_PROFILE`,
-`ROVER_CAMERA_FIDUCIALS_DECIMATE`, `ROVER_CAMERA_DETECTION_MAX_RATE`.
+3-4x slower (an estimate, not measured). Knobs: `ROVER_SENSORS_CAMERA_FPS` (6, 15 or 30), `ROVER_SENSORS_CAMERA_DEPTH_PROFILE`,
+`ROVER_SENSORS_CAMERA_FIDUCIALS_DECIMATE`, `ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE`.
 
 ## Topics
 

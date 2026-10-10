@@ -27,7 +27,7 @@ WARMUP=15
 PATTERNS=(realsense2_camera_node component_container apriltag_node terrain_node detection_node
           fmoc_node)
 TOPICS=(camera/color/image_raw camera/depth/image_rect_raw camera/depth/points tracked_person)
-NS="${ROVER_NAMESPACE:-}"
+NS="${ROVER_SYSTEM_NAMESPACE:-}"
 TICKS="$(getconf CLK_TCK)"
 
 DRIVER_ARGS=()

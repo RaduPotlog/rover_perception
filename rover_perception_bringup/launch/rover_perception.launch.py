@@ -18,19 +18,19 @@ The sensor drivers are not started here: rover_sensors does that (the RealSense 
 rover_realsense), and rover_sensors_bringup includes this file on top of them. In Gazebo the
 simulator publishes the same topics.
 
-ROVER_USE_CAMERA             camera-fed nodes below may run (default false)
-ROVER_CAMERA_FIDUCIALS       AprilTag detection on the colour stream (default false)
-ROVER_CAMERA_DETECTION       YOLO object detection on the colour stream (default false)
-ROVER_USE_TERRAIN            ground slope from the lidar cloud, no camera needed (default false)
-ROVER_START_FOLLOW_ME        fmoc person tracking on camera/depth/points -> tracked_person, for
-                             rover_orchestrator's follow-me (default false)
+ROVER_SYSTEM_USE_CAMERA         camera-fed nodes below may run (default false)
+ROVER_SENSORS_CAMERA_FIDUCIALS  AprilTag detection on the colour stream (default false)
+ROVER_SENSORS_CAMERA_DETECTION  YOLO object detection on the colour stream (default false)
+ROVER_SENSORS_TERRAIN           ground slope from the lidar cloud, no camera needed (default false)
+ROVER_SYSTEM_FOLLOW_ME_ENABLE   fmoc person tracking on camera/depth/points -> tracked_person,
+                                for rover_orchestrator's follow-me (default false)
 
 Cost knobs, for a loaded controller (all optional):
-ROVER_CAMERA_FIDUCIALS_DECIMATE   AprilTag decimation, higher = cheaper (default 2.0)
-ROVER_CAMERA_DETECTION_MAX_RATE   detections per second (default 10.0)
+ROVER_SENSORS_CAMERA_FIDUCIALS_DECIMATE  AprilTag decimation, higher = cheaper (default 2.0)
+ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE  detections per second (default 10.0)
 
-The camera sub-switches only matter while ROVER_USE_CAMERA is true. Person tracking is not tied
-to it: it only needs a depth cloud, which Gazebo provides without the RealSense driver.
+The camera sub-switches only matter while ROVER_SYSTEM_USE_CAMERA is true. Person tracking is not
+tied to it: it only needs a depth cloud, which Gazebo provides without the RealSense driver.
 """
 
 from launch import LaunchDescription
@@ -124,28 +124,31 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument(
-            'namespace', default_value=EnvironmentVariable('ROVER_NAMESPACE', default_value='')),
+            'namespace',
+            default_value=EnvironmentVariable('ROVER_SYSTEM_NAMESPACE', default_value='')),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
-        flag_arg('use_camera', 'ROVER_USE_CAMERA', 'false'),
-        flag_arg('use_fiducials', 'ROVER_CAMERA_FIDUCIALS', 'false'),
-        flag_arg('use_detection', 'ROVER_CAMERA_DETECTION', 'false'),
-        flag_arg('use_terrain', 'ROVER_USE_TERRAIN', 'false'),
-        flag_arg('use_person_tracking', 'ROVER_START_FOLLOW_ME', 'false'),
+        flag_arg('use_camera', 'ROVER_SYSTEM_USE_CAMERA', 'false'),
+        flag_arg('use_fiducials', 'ROVER_SENSORS_CAMERA_FIDUCIALS', 'false'),
+        flag_arg('use_detection', 'ROVER_SENSORS_CAMERA_DETECTION', 'false'),
+        flag_arg('use_terrain', 'ROVER_SENSORS_TERRAIN', 'false'),
+        flag_arg('use_person_tracking', 'ROVER_SYSTEM_FOLLOW_ME_ENABLE', 'false'),
         DeclareLaunchArgument(
             'detection_model',
-            default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_MODEL', default_value=''),
+            default_value=EnvironmentVariable(
+                'ROVER_SENSORS_CAMERA_DETECTION_MODEL', default_value=''),
             description='Path of the YOLO .onnx file.'),
         DeclareLaunchArgument(
             'fiducials_decimate',
             default_value=EnvironmentVariable(
-                'ROVER_CAMERA_FIDUCIALS_DECIMATE', default_value='2.0')),
+                'ROVER_SENSORS_CAMERA_FIDUCIALS_DECIMATE', default_value='2.0')),
         DeclareLaunchArgument(
             'detection_max_rate',
             default_value=EnvironmentVariable(
-                'ROVER_CAMERA_DETECTION_MAX_RATE', default_value='10.0')),
+                'ROVER_SENSORS_CAMERA_DETECTION_MAX_RATE', default_value='10.0')),
         DeclareLaunchArgument(
             'detection_use_gpu',
-            default_value=EnvironmentVariable('ROVER_CAMERA_DETECTION_GPU', default_value='false')),
+            default_value=EnvironmentVariable(
+                'ROVER_SENSORS_CAMERA_DETECTION_GPU', default_value='false')),
         apriltag,
         detection,
         terrain,

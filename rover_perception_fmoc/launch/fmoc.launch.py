@@ -56,7 +56,8 @@ def _launch_setup(context):
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
-            'namespace', default_value=EnvironmentVariable('ROVER_NAMESPACE', default_value='')),
+            'namespace',
+            default_value=EnvironmentVariable('ROVER_SYSTEM_NAMESPACE', default_value='')),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         DeclareLaunchArgument(
             'global_frame', default_value='odom',
